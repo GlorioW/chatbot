@@ -15,7 +15,6 @@ st.markdown("""
 - 提供专业的趋势分析和预测
 - 分析整体市场情绪
 - 提供详细的交易计划
-- 生成多种风格的分析总结推文
 """)
 
 # 内置 OpenAI API 配置
@@ -152,42 +151,12 @@ def generate_trading_plan(symbol):
         请为交易对 {symbol}/USDT 提供一个详细的顺应趋势的交易计划。包括但不限于入场点、止损点、目标价位和资金管理策略。
         """
         response = client.chat.completions.create(
-            model="gpt-3.5-turbo",
+            model="gpt-4o-2024-11-20",
             messages=[{"role": "user", "content": prompt}]
         )
         return response.choices[0].message.content
     except Exception as e:
         return f"交易计划生成失败: {str(e)}"
-
-def generate_tweet(symbol, analysis_summary, style):
-    """生成推文内容"""
-    try:
-        style_prompts = {
-            "女生": "以女生的语气",
-            "交易员": "以交易员的专业语气",
-            "分析师": "以金融分析师的专业语气",
-            "媒体": "以媒体报道的客观语气"
-        }
-
-        style_prompt = style_prompts.get(style, "")
-
-        prompt = f"""
-        {style_prompt} 请根据以下分析总结，为交易对 {symbol}/USDT 撰写一条简洁且专业的推文，适合发布在推特上。推文应包括当前价格、市场情绪、主要趋势以及操作建议。限制在280个字符以内。
-
-        分析总结：
-        {analysis_summary}
-        """
-        response = client.chat.completions.create(
-            model="gpt-3.5-turbo",
-            messages=[{"role": "user", "content": prompt}]
-        )
-        tweet = response.choices[0].message.content.strip()
-        # 确保推文不超过280字符
-        if len(tweet) > 280:
-            tweet = tweet[:277] + "..."
-        return tweet
-    except Exception as e:
-        return f"推文生成失败: {str(e)}"
 
 def get_ai_analysis(symbol, analysis_data, trading_plan):
     """获取 AI 分析结果"""
@@ -231,7 +200,7 @@ def get_ai_analysis(symbol, analysis_data, trading_plan):
         请确保分析专业、客观，并注意不同时间框架的趋势关系。
         """
         response = client.chat.completions.create(
-            model="gpt-3.5-turbo",
+            model="gpt-4o-2024-11-20",
             messages=[{"role": "user", "content": prompt}]
         )
         return response.choices[0].message.content
@@ -288,46 +257,7 @@ if analyze_button:
             st.subheader("整体市场情绪")
             st.write(market_sentiment)
 
-            # 生成推文
-            st.markdown("---")
-            st.subheader("多风格推文建议")
-
             analysis_summary = f"{analysis}\n市场情绪：{market_sentiment}"
-
-            # 定义所有风格
-            styles = {
-                "女生风格": "女生",
-                "交易员风格": "交易员",
-                "分析师风格": "分析师",
-                "媒体风格": "媒体"
-            }
-
-            # 创建两列布局来显示推文
-            col1, col2 = st.columns(2)
-
-            # 生成并显示所有风格的推文
-            for i, (style_name, style) in enumerate(styles.items()):
-                tweet = generate_tweet(symbol, analysis_summary, style)
-                # 在左列显示前两个风格
-                if i < 2:
-                    with col1:
-                        st.subheader(f"📝 {style_name}")
-                        st.text_area(
-                            label="",
-                            value=tweet,
-                            height=150,
-                            key=f"tweet_{style}"
-                        )
-                # 在右列显示后两个风格
-                else:
-                    with col2:
-                        st.subheader(f"📝 {style_name}")
-                        st.text_area(
-                            label="",
-                            value=tweet,
-                            height=150,
-                            key=f"tweet_{style}"
-                        )
 
             # 添加时间戳
             st.caption(f"分析时间: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
@@ -344,10 +274,4 @@ with st.sidebar:
         time.sleep(refresh_interval)
         st.experimental_rerun()
 
-    st.markdown("---")
-    st.subheader("注意事项")
-    st.write("请确保您的分析仅供参考，不构成投资建议。加密货币市场风险较大，请谨慎决策。")
 
-# 添加页脚
-st.markdown("---")
-st.caption("免责声明：本分析仅供参考，不构成投资建议。加密货币市场风险较大，请谨慎决策。")
