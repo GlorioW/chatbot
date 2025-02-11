@@ -21,8 +21,10 @@ st.markdown("""
 OPENAI_API_KEY = ""  # 替换为您的 API key
 client = OpenAI(
     api_key=OPENAI_API_KEY,
-    base_url="https://api.tu-zi.com/v1"
+    base_url="https://api.tu-zi.com/v1",
+
 )
+choice_model="openai-gpt-4o"
 
 # Binance API 端点
 BINANCE_API_URL = "https://api.binance.com/api/v3"
@@ -148,10 +150,10 @@ def generate_trading_plan(symbol):
     """生成交易计划"""
     try:
         prompt = f"""
-        请为交易对 {symbol}/USDT 提供一个详细的顺应趋势的交易计划。包括但不限于入场点、止损点、杠杆倍数、目标价位和资金管理策略。
+        请为交易对 {symbol}/USDT 提供一个详细的顺应趋势的交易计划。包括但不限于入场点、止损点、建议杠杆倍数、目标价位和资金管理策略。
         """
         response = client.chat.completions.create(
-            model="o1",
+            model=choice_model,
             messages=[{"role": "user", "content": prompt}]
         )
         return response.choices[0].message.content
@@ -200,7 +202,7 @@ def get_ai_analysis(symbol, analysis_data, trading_plan):
         请确保分析专业、客观，并注意不同时间框架的趋势关系。
         """
         response = client.chat.completions.create(
-            model="gpt-3.5-turbo",
+            model=choice_model,
             messages=[{"role": "user", "content": prompt}]
         )
         return response.choices[0].message.content
