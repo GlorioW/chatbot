@@ -148,10 +148,10 @@ def generate_trading_plan(symbol):
     """生成交易计划"""
     try:
         prompt = f"""
-        请为交易对 {symbol}/USDT 提供一个详细的顺应趋势的交易计划。包括但不限于入场点、止损点、目标价位和资金管理策略。
+        请为交易对 {symbol}/USDT 提供一个详细的顺应趋势的交易计划。包括但不限于入场点、止损点、杠杆倍数、目标价位和资金管理策略。
         """
         response = client.chat.completions.create(
-            model="gpt-4o-2024-11-20",
+            model="o1",
             messages=[{"role": "user", "content": prompt}]
         )
         return response.choices[0].message.content
@@ -163,7 +163,7 @@ def get_ai_analysis(symbol, analysis_data, trading_plan):
     try:
         # 准备多周期分析数据
         prompt = f"""
-        作为一位专业的加密货币分析师，请基于以下{symbol}的多周期分析数据提供详细的市场报告：
+        作为一位善用利用杠杆扩大收益的专业加密货币分析师，请基于以下{symbol}的多周期分析数据提供详细的市场报告：
 
         各周期趋势分析：
         {analysis_data}
@@ -200,7 +200,7 @@ def get_ai_analysis(symbol, analysis_data, trading_plan):
         请确保分析专业、客观，并注意不同时间框架的趋势关系。
         """
         response = client.chat.completions.create(
-            model="gpt-4o-2024-11-20",
+            model="gpt-3.5-turbo",
             messages=[{"role": "user", "content": prompt}]
         )
         return response.choices[0].message.content
